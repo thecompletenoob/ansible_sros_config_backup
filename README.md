@@ -11,11 +11,14 @@ A cron job can be added later to run at certain times.
 
 * Take note of RSA fingerprints  
 * Modify ssh config to support the legacy equipment with old ciphers etc.  
-`Host SR*`  
-`Ciphers aes256-cbc`  
-    `HostKeyAlgorithms ssh-dss`  
-    `KexAlgorithms diffie-hellman-group1-sha1`  
-    `User admin`
+
+    ```SSH Config
+    Host SR*  
+        Ciphers aes256-cbc  
+        HostKeyAlgorithms ssh-dss  
+        KexAlgorithms diffie-hellman-group1-sha1  
+        User admin
+    ```
 
 ## Using a Python script
 
