@@ -1,0 +1,25 @@
+---
+- hosts: SR1
+  vars:
+    - ansible_network_os: nokia.sros.classic
+  vars_prompt:
+    - name: ansible_user
+      prompt: "Username"
+      private: no
+    - name: ansible_password
+      prompt: "Password"
+  connection: network_cli
+  gather_facts: No
+
+  collections:
+    - nokia.sros
+
+  tasks:
+    - name: get system information
+      cli_command:
+        command: show version
+      register: output1
+
+    - name: display output
+      debug:
+        msg: "{{ output1.stdout_lines }}"

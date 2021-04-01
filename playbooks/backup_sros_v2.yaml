@@ -1,0 +1,49 @@
+---
+- name: Backup
+  hosts: Nokia
+  gather_facts: no
+  connection: network_cli
+
+  vars:
+    ansible_network_os: nokia.sros.classic
+    # cli:
+    #   host: "{{ inventory_hostname }}"
+    #   transport: cli
+
+  tasks:
+    - name: Admin Display config
+      community.network.sros_command:
+        commands:
+          - admin display-config
+        # provider: "{{ cli }}"
+
+      register: results
+
+    # - debug: msg="{{ results.stdout[0] }}"
+
+    - name: Save Output to Backup Folder
+      copy:
+        content: "{{ results.stdout[0] }}"
+        dest: "/home/enoc/network_dev/sros_backup/backups/{{ inventory_hostname }}.txt"
+
+# GIT COMMANDS
+- name: GIT
+  hosts: localhost
+
+  tasks:
+    - name: Time
+      command: date
+      register: time
+      changed_when: false
+      delegate_to: localhost
+      run_once: yes
+
+    - name: git commands
+      shell: |
+        git add .
+        git commit -m "Device Backup on {{ time.stdout }} "
+        git push
+      args:
+        chdir: /home/enoc/network_dev/sros_backup/backups
+      delegate_to: localhost
+      run_once: yes
