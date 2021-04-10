@@ -1,21 +1,24 @@
 ---
-- name: Backup
+# to use install:
+# ansible-galaxy collection install community.network
+# Problem -> Shows the date config was generated in the config file
+# So idempotency doesn't work and config file is changed every time because
+#  of the timestamp in the file
+
+- name: Backup Nokia Nodes with community.network module
   hosts: Nokia
   gather_facts: no
   connection: network_cli
 
   vars:
-    ansible_network_os: nokia.sros.classic
-    # cli:
-    #   host: "{{ inventory_hostname }}"
-    #   transport: cli
+    ansible_network_os: sros
+    backup_directory: "folderpath"
 
   tasks:
     - name: Admin Display config
       community.network.sros_command:
         commands:
           - admin display-config
-        # provider: "{{ cli }}"
 
       register: results
 
@@ -24,7 +27,14 @@
     - name: Save Output to Backup Folder
       copy:
         content: "{{ results.stdout[0] }}"
-        dest: "/home/enoc/network_dev/sros_backup/backups/{{ inventory_hostname }}.txt"
+        dest: "{{ backup_directory }}{{ inventory_hostname }}.txt"
+#
+# We can remove the line if we wanted to exclude that line in the git changes
+# - name: Remove lines
+#   lineinfile:
+#     path: "{{ backup_directory }}{{ inventory_hostname }}.txt"
+#     regexp: "# Generated.*"
+#     state: absent
 
 # GIT COMMANDS
 - name: GIT
@@ -44,6 +54,6 @@
         git commit -m "Device Backup on {{ time.stdout }} "
         git push
       args:
-        chdir: /home/enoc/network_dev/sros_backup/backups
+        chdir: "{{ backup_directory }}"
       delegate_to: localhost
       run_once: yes

@@ -1,0 +1,51 @@
+---
+# to use, install:
+# ansible-galaxy collection install nokia.sros
+# Problem -> Doesn't show the date config was generated in the config file
+# But idempotency works
+- name: Backup Nokia Nodes with nokia.sros module
+  hosts: Nokia
+  gather_facts: no
+  connection: network_cli
+
+  vars:
+    - ansible_network_os: nokia.sros.classic
+      backup_directory: "folderpath"
+
+  collections:
+    - nokia.sros
+
+  tasks:
+    - name: Backup
+      cli_config:
+        backup: yes
+        backup_options:
+          dir_path: "{{ backup_directory }}"
+          filename: "{{ inventory_hostname }}_config"
+      register: backup_info
+
+    - name: backup details
+      debug:
+        msg: "{{ backup_info }}"
+
+# GIT COMMANDS
+- name: GIT
+  hosts: localhost
+
+  tasks:
+    - name: Time
+      command: date
+      register: time
+      changed_when: false
+      delegate_to: localhost
+      run_once: yes
+
+    - name: git commands
+      shell: |
+        git add .
+        git commit -m "Device Backup on {{ time.stdout }} "
+        git push
+      args:
+        chdir: "{{ backup_directory }}"
+      delegate_to: localhost
+      run_once: yes

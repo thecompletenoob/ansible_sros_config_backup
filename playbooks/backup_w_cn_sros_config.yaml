@@ -1,0 +1,27 @@
+---
+# to use, install:
+# ansible-galaxy collection install community.network
+# Problem -> Shows the date config was generated in the config file
+# So idempotency doesn't work and config file is changed every time because
+#  of the timestamp in the file
+- name: Backup Nokia Nodes with community.network module
+  hosts: Nokia
+  gather_facts: no
+  connection: network_cli
+
+  vars:
+    - ansible_network_os: sros
+      backup_directory: "folderpath"
+
+  tasks:
+    - name: Admin Display config
+      community.network.sros_config:
+        backup: yes
+        backup_options:
+          dir_path: "{{ backup_directory }}"
+          filename: "{{ inventory_hostname }}_config"
+      register: backup_info
+
+    - name: backup details
+      debug:
+        msg: "{{ backup_info }}"
