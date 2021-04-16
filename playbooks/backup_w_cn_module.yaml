@@ -39,6 +39,9 @@
 # GIT COMMANDS
 - name: GIT
   hosts: localhost
+  gather_facts: no
+  vars:
+    backup_directory: "folderpath"
 
   tasks:
     - name: Time
