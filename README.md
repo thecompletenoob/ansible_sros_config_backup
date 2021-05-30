@@ -20,6 +20,8 @@ A cron job can be added later to run at certain times.
         User <username>
     ```
 
+* When using read-only accounts, ensure that the user has access to the `environment` command as the program needs to modify the terminal length to get all the output.
+
 ## Using a Python script
 
 * Use netmiko
